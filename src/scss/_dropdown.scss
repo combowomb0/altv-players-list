@@ -1,0 +1,21 @@
+.dropdown {
+  position: absolute;
+  &__list {
+    background-color: $main-color;
+    list-style-type: none;
+    border-radius: 5px;
+    box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.15);
+    & li {
+      color: white;
+      padding: 10px 20px;
+      cursor: pointer;
+      // &:not(:last-of-type) {
+      //   border-bottom: 1px solid #ddd;
+      // }
+      &:hover {
+        color: #666666;
+        background-color: $primary-color
+      }
+    }
+  }
+}

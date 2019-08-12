@@ -11,6 +11,9 @@ alt.on('connectionComplete', () => {
   playerList.view.on('playersList:loaded', () => {
     playerList.isLoaded = true;
   });
+  playerList.view.on('playersList:optionExecute', (id, name) => {
+    alt.emitServer('playersList:optionExecute', id, name);
+  });
 });
 
 alt.on('keydown', (key) => {

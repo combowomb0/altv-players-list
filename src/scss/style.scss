@@ -1,8 +1,9 @@
-@import 'fonts';
-@import 'interface';
-
 $main-color: #6c7ae0;
 $primary-color: #ececff;
+
+@import 'fonts';
+@import 'interface';
+@import 'dropdown';
 
 .wrap {
   width: 100%;
