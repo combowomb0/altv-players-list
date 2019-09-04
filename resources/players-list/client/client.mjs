@@ -7,7 +7,7 @@ const playerList = {
 }
 
 alt.on('connectionComplete', () => {
-  playerList.view = new alt.WebView('http://resources/players-list/client/view/index.html');
+  playerList.view = new alt.WebView('http://resource/client/view/index.html');
   playerList.view.on('playersList:loaded', () => {
     playerList.isLoaded = true;
   });
