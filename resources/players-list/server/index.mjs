@@ -1,40 +1,30 @@
-import alt from 'alt';
+import * as alt from 'alt-server';
 
-const getIdxInArray = (array, desiredName, desiredValue) => {
-  const idx = array.map(element => {
-    return element[desiredName]
-  }).indexOf(desiredValue);
-  return idx;
-};
-
-const menuOptions = { //names must match the names in options in main.js
+const options = {
   'Kick': {
-    execute: (player) => {
-      player.kick();
-    }
+    execute: (player) => player.kick()
   },
   'Kill': {
-    execute: (player) => {
-      player.health = 0;
-    }
+    execute: (player) => player.health = 0
   }
-}
+};
 
-let data = [];
-alt.onClient('playersList:fetch', (player) => {
-  data = [];
-  alt.Player.all.forEach(player => {
-    data.push({
-      id: player.id,
-      name: player.name,
-      ping: player.ping
-    });
-  });
-  alt.emitClient(player, 'playersList:update', data);
-})
+alt.onClient('playersList:getOptions', (player) => {
+  alt.emitClient(player, 'playersList:setOptions', Object.keys(options));
+});
 
-alt.onClient('playersList:optionExecute', (player, id, name) => {
-  id = parseInt(id);
-  const idx = getIdxInArray(data, 'id', id);
-  menuOptions[name].execute(alt.Player.all[idx]);
+alt.onClient('playersList:getPlayers', (player) => {
+  alt.emitClient(player, 'playersList:setPlayers', alt.Player.all.map(player => ({
+    id: player.id,
+    name: player.name,
+    ping: player.ping
+  })));
+});
+
+alt.onClient('playersList:optionExecute', (_, id, optionName) => {
+  const player = alt.Player.all.find(player => player.id === id);
+
+  if (player) {
+    options[optionName].execute(player);
+  }
 });
