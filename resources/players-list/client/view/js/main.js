@@ -2,42 +2,6 @@ const players = document.querySelector('.players');
 const template = document.querySelector('.template');
 const menuOptions = document.querySelector('.dropdown__list');
 
-if ('alt' in window) {
-  alt.emit('playersList:loaded');
-}
-
-alt.on('playersList:show', () => document.body.hidden = false);
-
-alt.on('playersList:hide', () => {
-  document.body.hidden = true;
-
-  if (menu.isShowed()) {
-    menu.hide();
-  };
-});
-
-alt.on('playersList:setPlayers', (allPlayers) => {
-  players.innerHTML = '';
-
-  allPlayers.forEach(player => {
-    const clone = template.cloneNode(true);
-    clone.hidden = false;
-    clone.querySelector('.id').innerText = player.id;
-    clone.querySelector('.name').innerText = player.name;
-    clone.querySelector('.ping').innerText = player.ping;
-    players.append(clone);
-  });
-});
-
-alt.on('playersList:setOptions', (options) => {
-  options.forEach(label => {
-    const li = document.createElement('li');
-    li.className = 'dropdown__item';
-    li.innerText = label;
-    menuOptions.append(li);
-  });
-});
-
 class Menu {
   constructor() {
     this.element = document.querySelector('.dropdown');
@@ -84,42 +48,87 @@ class Menu {
     const clientHeight = document.documentElement.clientHeight;
 
     if (menuCoords.top + this.element.offsetHeight > clientHeight) {
-      this.element.style.top = parseInt(this.element.style.top) - this.element.offsetHeight + 'px';
+      this.element.style.top = parseInt(this.element.style.top, 10) - this.element.offsetHeight + 'px';
     }
   }
 }
 
 const menu = new Menu();
 
-players.addEventListener('click', () => {
-  const target = event.target.parentNode;
+if (players) {
+  players.addEventListener('click', (event) => {
+    const target = event.target.parentNode;
 
-  if (menu.isShowed()) {
-    menu.hide();
+    if (menu.isShowed()) {
+      menu.hide();
 
-    return;
-  };
+      return;
+    };
 
-  if (target.classList.contains('row')) {
-    menu.setTarget(target);
-    menu.highlightRow(target);
-    menu.render();
-  }
-});
+    if (target.classList.contains('row')) {
+      menu.setTarget(target);
+      menu.highlightRow(target);
+      menu.render();
+    }
+  });
 
-players.addEventListener('mousewheel', () => {
-  if (menu.isShowed()) {
-    menu.hide();
-  };
-});
+  players.addEventListener('mousewheel', () => {
+    if (menu.isShowed()) {
+      menu.hide();
+    };
+  });
+}
 
-menuOptions.addEventListener('click', () => {
-  const target = event.target;
+if (menuOptions) {
+  menuOptions.addEventListener('click', ({ target }) => {
+    if (target && target.classList.contains('dropdown__item')) {
+      const row = menu.getTarget();
+      const id = parseInt(row.querySelector('.id').innerText, 10);
+      alt.emit('playersList:optionExecute', id, target.innerText);
+      menu.hide();
+    }
+  });
+}
 
-  if (target.classList.contains('dropdown__item')) {
-    const row = menu.getTarget();
-    const id = parseInt(row.querySelector('.id').innerText, 10);
-    alt.emit('playersList:optionExecute', id, target.innerText);
-    menu.hide();
-  }
-});
+if ('alt' in window) {
+  window.alt.emit('playersList:loaded');
+
+  window.alt.on('playersList:show', () => document.body.hidden = false);
+
+  window.alt.on('playersList:hide', () => {
+    document.body.hidden = true;
+
+    if (menu.isShowed()) {
+      menu.hide();
+    };
+  });
+
+  window.alt.on('playersList:setPlayers', (allPlayers) => {
+    if (players) {
+      players.innerHTML = '';
+    }
+
+    allPlayers.forEach(player => {
+      if (template && players) {
+        const clone = template.cloneNode(true);
+        clone.hidden = false;
+        clone.querySelector('.id').innerText = player.id;
+        clone.querySelector('.name').innerText = player.name;
+        clone.querySelector('.ping').innerText = player.ping;
+        players.append(clone);
+      }
+    });
+  });
+
+  window.alt.on('playersList:setOptions', (options) => {
+    options.forEach(label => {
+      const li = document.createElement('li');
+      li.className = 'dropdown__item';
+      li.innerText = label;
+
+      if (menuOptions) {
+        menuOptions.append(li);
+      }
+    });
+  });
+}
